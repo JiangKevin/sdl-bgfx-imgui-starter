@@ -10,8 +10,11 @@ emcmake cmake -B embuild/release-emscripten -G Ninja \
 # 构建shader的编译路径
 mkdir -p shader/embuild
 ./tools/macos/bin/shaderc \
-    -f shader/f_simple.sc -o shader/embuild/f_simple.bin \
+    -f apps/${app_name}/shader/f_simple.sc -o apps/${app_name}/shader/embuild/f_simple.bin \
     --platform asmjs --type fragment --verbose -i ./
 
+#
+time_cur=$(date)
+echo $time_cur
 #
 cmake --build embuild/release-emscripten

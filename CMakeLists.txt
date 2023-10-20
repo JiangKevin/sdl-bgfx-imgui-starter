@@ -55,33 +55,14 @@ target_link_libraries(
 #
 target_link_options(
   ${PROJECT_NAME} PRIVATE $<$<BOOL:${EMSCRIPTEN}>:-sMAX_WEBGL_VERSION=2
-  -sALLOW_MEMORY_GROWTH=1 --preload-file=$ENV{dev_root}/website/$ENV{app_name}/shader/embuild/v_simple.bin
-  --preload-file=$ENV{dev_root}/website/$ENV{app_name}/shader/embuild/f_simple.bin>
+  -sALLOW_MEMORY_GROWTH=1 --preload-file $ENV{dev_root}/apps/$ENV{app_name}/shader@shader >
 )
 
 #
 target_compile_definitions(
   ${PROJECT_NAME} PRIVATE $<$<BOOL:${EMSCRIPTEN}>:USE_SDL=2>
 )
-message("----------")
-
 #
 if(EMSCRIPTEN)
   set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
-  message("----------")
-  add_custom_command(
-    TARGET ${PROJECT_NAME}
-    PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E make_directory
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shader/embuild
-    COMMAND
-    ${CMAKE_COMMAND} -E copy_if_different
-    $ENV{dev_root}/shader/embuild/v_simple.bin
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shader/embuild
-    COMMAND
-    ${CMAKE_COMMAND} -E copy_if_different
-    $ENV{dev_root}/shader/embuild/f_simple.bin
-    $<TARGET_FILE_DIR:${PROJECT_NAME}>/shader/embuild
-    VERBATIM
-  )
 endif()
