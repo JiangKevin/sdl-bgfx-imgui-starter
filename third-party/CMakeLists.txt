@@ -1,38 +1,40 @@
 cmake_minimum_required(VERSION 3.24)
 
-if (NOT SUPERBUILD)
+if(NOT SUPERBUILD)
   project(third-party)
-endif ()
+endif()
 
 include(ExternalProject)
 
 get_property(isMultiConfig GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
-if (NOT isMultiConfig)
-  if (NOT CMAKE_BUILD_TYPE)
+
+if(NOT isMultiConfig)
+  if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE
-        Debug
-        CACHE STRING "" FORCE)
-  endif ()
+      Debug
+      CACHE STRING "" FORCE)
+  endif()
+
   set(build_type_dir ${CMAKE_BUILD_TYPE})
   set(build_type_arg -DCMAKE_BUILD_TYPE=$<CONFIG>)
-else ()
+else()
   set(build_config_arg --config=$<CONFIG>)
-endif ()
+endif()
 
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
   set(THIRD_PARTY_CMAKE_COMMAND emcmake cmake)
-else ()
+else()
   set(THIRD_PARTY_CMAKE_COMMAND ${CMAKE_COMMAND})
-endif ()
+endif()
 
-if (SUPERBUILD)
+if(SUPERBUILD)
   set(PREFIX_DIR
-      ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${THIRD_PARTY_BUILD_DIR_NAME})
-else ()
+    ${CMAKE_CURRENT_SOURCE_DIR}/third-party/${THIRD_PARTY_BUILD_DIR_NAME})
+else()
   set(PREFIX_DIR ${CMAKE_CURRENT_BINARY_DIR})
-endif ()
+endif()
 
-if (NOT EMSCRIPTEN)
+if(NOT EMSCRIPTEN)
   ExternalProject_Add(
     SDL2
     URL https://github.com/libsdl-org/SDL/releases/download/release-2.26.5/SDL2-2.26.5.tar.gz
@@ -43,8 +45,8 @@ if (NOT EMSCRIPTEN)
     CMAKE_ARGS ${build_type_arg} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
     BUILD_COMMAND cmake --build <BINARY_DIR> ${build_config_arg}
     INSTALL_COMMAND cmake --build <BINARY_DIR> --target install
-                    ${build_config_arg})
-endif ()
+    ${build_config_arg})
+endif()
 
 ExternalProject_Add(
   bgfx
@@ -54,13 +56,13 @@ ExternalProject_Add(
   BINARY_DIR ${PREFIX_DIR}/src/bgfx-build/${build_type_dir}
   CMAKE_COMMAND ${THIRD_PARTY_CMAKE_COMMAND}
   CMAKE_ARGS ${build_type_arg}
-             -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-             "$<$<CONFIG:Debug>:-DCMAKE_DEBUG_POSTFIX=d>"
-             "$<$<PLATFORM_ID:Emscripten>:-DBGFX_CONFIG_MULTITHREADED=OFF>"
-             -DBGFX_BUILD_EXAMPLES=OFF
+  -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+  "$<$<CONFIG:Debug>:-DCMAKE_DEBUG_POSTFIX=d>"
+  "$<$<PLATFORM_ID:Emscripten>:-DBGFX_CONFIG_MULTITHREADED=OFF>"
+  -DBGFX_BUILD_EXAMPLES=OFF
   BUILD_COMMAND cmake --build <BINARY_DIR> ${build_config_arg}
   INSTALL_COMMAND cmake --build <BINARY_DIR> --target install
-                  ${build_config_arg})
+  ${build_config_arg})
 
 ExternalProject_Add(
   imgui.cmake
@@ -70,8 +72,8 @@ ExternalProject_Add(
   BINARY_DIR ${PREFIX_DIR}/src/imgui.cmake-build/${build_type_dir}
   CMAKE_COMMAND ${THIRD_PARTY_CMAKE_COMMAND}
   CMAKE_ARGS ${build_type_arg} -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-             "$<$<CONFIG:Debug>:-DCMAKE_DEBUG_POSTFIX=d>"
-             -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS=ON
+  "$<$<CONFIG:Debug>:-DCMAKE_DEBUG_POSTFIX=d>"
+  -DIMGUI_DISABLE_OBSOLETE_FUNCTIONS=ON
   BUILD_COMMAND cmake --build <BINARY_DIR> ${build_config_arg}
   INSTALL_COMMAND cmake --build <BINARY_DIR> --target install
-                  ${build_config_arg})
+  ${build_config_arg})
